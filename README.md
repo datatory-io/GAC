@@ -5,10 +5,10 @@
 GAC is an api client generator based on openapi3. Unlike other solutions, the runtime or boilerplate part should be kept
 very small to avoid complicated integration measures in existing code.
 
-### Install
+#### Install
 
-``` go get -u github.com/datatory-io/GAC```
+    go get -u github.com/datatory-io/gac
 
-### Usage
+#### Usage
 
 tbd.

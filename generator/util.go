@@ -3,10 +3,13 @@ package main
 import (
 	"fmt"
 	"github.com/getkin/kin-openapi/openapi3"
+	"github.com/gosimple/slug"
+	"github.com/iancoleman/strcase"
 	"log"
 	"net/url"
 	"os"
 	"runtime/debug"
+	"strings"
 )
 
 func exitErr(format string, args ...interface{}) {
@@ -40,6 +43,10 @@ func displayVersion() {
 	fmt.Println(bi.Main.Version)
 }
 
+func Untrail(in string) string {
+	return strings.TrimSuffix(in, "/")
+}
+
 func getVersion() string {
 	bi, ok := debug.ReadBuildInfo()
 	if !ok {
@@ -60,4 +67,26 @@ func LoadSwagger(filePath string) (swagger *openapi3.T, err error) {
 	} else {
 		return loader.LoadFromFile(filePath)
 	}
+}
+
+func Sluggify(in string) string {
+	return slug.Make(in)
+}
+
+func CamelCase(in string) string {
+	return strcase.ToCamel(in)
+}
+
+func AssembleServerUri(url string, vars map[string]*openapi3.ServerVariable) string {
+
+	if len(vars) < 1 {
+		return url
+	}
+
+	uri := url
+	for name, svar := range vars {
+		uri = strings.ReplaceAll(uri, "{"+name+"}", svar.Default)
+	}
+
+	return uri
 }
