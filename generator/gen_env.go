@@ -13,6 +13,9 @@ func generateEnvironments(f *File, t *openapi3.T, foreignPackage bool) {
 		prototype = "gac.PrototypeEnvironment"
 	}
 
+	f.Comment(GenerationTag(t))
+	f.Line().Line()
+
 	for idx, srv := range t.Servers {
 
 		ident := fmt.Sprintf("srv%d", idx)
@@ -21,6 +24,7 @@ func generateEnvironments(f *File, t *openapi3.T, foreignPackage bool) {
 			name = CamelCase(Sluggify(srv.URL))
 		}
 
+		f.Comment(fmt.Sprintf("%s represents: %s", name, srv.Description))
 		f.Type().Id(name).Struct(
 			Id(prototype),
 			Id("Name").String(),
@@ -29,6 +33,7 @@ func generateEnvironments(f *File, t *openapi3.T, foreignPackage bool) {
 
 		url := AssembleServerUri(srv.URL, srv.Variables)
 
+		f.Comment(fmt.Sprintf("Init%s initializes %s", name, name))
 		f.Func().Id("Init"+name).Params().Id("Environment").Block(
 			Id("op").Op(":=").Op("&").Id(name).Values(Dict{
 				Id("Name"): Lit(name),
@@ -37,10 +42,12 @@ func generateEnvironments(f *File, t *openapi3.T, foreignPackage bool) {
 			Return(Id("op")),
 		)
 
+		f.Comment("GetName returns the environments name")
 		f.Func().Params(Id(ident).Op("*").Id(name)).Id("GetName").Params().String().Block(
 			Return(Id(ident).Dot("Name")),
 		)
 
+		f.Comment("GetUri returns the environments URL")
 		f.Func().Params(Id(ident).Op("*").Id(name)).Id("GetUri").Params().String().Block(
 			Return(Id(ident).Dot("Url")),
 		)

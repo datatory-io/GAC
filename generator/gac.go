@@ -99,4 +99,16 @@ func main() {
 	_, _ = fmt.Fprintf(fh, "%#v", environment)
 	fh.Close()
 
+	// ###### Path
+
+	paths := jen.NewFile(PackageName)
+
+	generatePaths(paths, oa3, PackageName != "gac")
+
+	fh, err = os.Create(OutputDir + "/endpoints.go")
+	if err != nil {
+		exitErr("unable to open file for writing in dir %s (ERR: %s)", OutputDir, err)
+	}
+	_, _ = fmt.Fprintf(fh, "%#v", paths)
+	fh.Close()
 }
