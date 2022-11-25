@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+
 	. "github.com/dave/jennifer/jen"
 	"github.com/getkin/kin-openapi/openapi3"
 )
@@ -34,7 +35,11 @@ func generatePaths(f *File, t *openapi3.T, foreignPackage bool) {
 
 			f.Comment(fmt.Sprintf("%s is the initialization for %s", funcName, structName))
 			f.Func().Id(funcName).Params().Id("Endpoint").Block(
-				Id("ep").Op(":=").Op("&").Id(structName).Values(Dict{}),
+				Id("ep").Op(":=").Op("&").Id(structName).Values(Dict{
+					Id("Endpoint"): Lit(path),
+					Id("Method"):   Lit(method),
+					Id("Header"):   extractParamsAsDict("header", op.Parameters),
+				}),
 				Return(Id("ep")),
 			)
 		}

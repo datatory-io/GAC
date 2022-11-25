@@ -2,14 +2,16 @@ package main
 
 import (
 	"fmt"
-	"github.com/getkin/kin-openapi/openapi3"
-	"github.com/gosimple/slug"
-	"github.com/iancoleman/strcase"
 	"log"
 	"net/url"
 	"os"
 	"runtime/debug"
 	"strings"
+
+	"github.com/dave/jennifer/jen"
+	"github.com/getkin/kin-openapi/openapi3"
+	"github.com/gosimple/slug"
+	"github.com/iancoleman/strcase"
 )
 
 func exitErr(format string, args ...interface{}) {
@@ -98,4 +100,16 @@ func AssembleServerUri(url string, vars map[string]*openapi3.ServerVariable) str
 	}
 
 	return uri
+}
+
+func extractParamsAsDict(in string, params openapi3.Parameters) jen.Dict {
+
+	values := jen.Dict{}
+	for _, p := range params {
+		if p.Value.In == in {
+			values[jen.Id(p.Value.Name)] = jen.Lit(p.Value.Content)
+		}
+	}
+
+	return values
 }
